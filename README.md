@@ -1,6 +1,6 @@
 # Integración de Link React SDK
 
-Situado en la carpeta raz del proyecto, ejecutar los siguientes comandos:
+Situado en la carpeta raíz del proyecto, ejecutar los siguientes comandos:
 
 ### Instalar dependencias
 
@@ -8,8 +8,16 @@ Situado en la carpeta raz del proyecto, ejecutar los siguientes comandos:
 npm install
 ```
 
-###
+### Iniciar proyecto
 
 ```
 npm start
+```
+
+### Visualizar proyecto
+
+Si la ventana no se abre automaticamente, puedes dirigirte al navegador con la siguiente ruta:
+
+```
+http://localhost:3000
 ```
