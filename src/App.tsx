@@ -1,6 +1,13 @@
-import React, { FunctionComponent, useState, useCallback } from "react";
+import React, { FunctionComponent, useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { usePlaidLink, PlaidLinkOptions, PlaidLinkOnSuccess } from "react-plaid-link";
+import {
+	usePlaidLink,
+	PlaidLinkOptions,
+	PlaidLinkOnSuccess,
+	PlaidLinkOnEvent,
+	PlaidLinkOnEventMetadata,
+	PlaidLinkStableEvent,
+} from "react-plaid-link";
 import { Button, TextField } from "@material-ui/core";
 
 interface Props {
@@ -8,26 +15,47 @@ interface Props {
 }
 
 const PlaidLink: FunctionComponent<Props> = ({ token }) => {
+	const [isValid, setIsValid] = useState<Boolean | null>(null);
 	const onSuccess = useCallback<PlaidLinkOnSuccess>((public_token, metadata) => {
 		// send public_token to server
 	}, []);
+
+	const onEvent = useCallback<PlaidLinkOnEvent>(
+		(eventName: PlaidLinkStableEvent | string, metadata: PlaidLinkOnEventMetadata) => {
+			console.log(metadata);
+
+			if (eventName === "OPEN" && metadata.link_session_id) {
+				setIsValid(true);
+			}
+
+			if (eventName === "EXIT" && metadata.exit_status && !metadata.link_session_id) {
+				setIsValid(false);
+			}
+		},
+		[]
+	);
 
 	const config: PlaidLinkOptions = {
 		token,
 		onSuccess,
 		// onExit
-		// onEvent
+		onEvent,
 	};
 
-	const { open, ready, error } = usePlaidLink(config);
+	const { open, ready } = usePlaidLink(config);
 
-	console.log(error, open, ready);
+	useEffect(() => {
+		if (!ready) {
+			return;
+		}
+		open();
+	}, [ready, open]);
 
-	return (
-		<Button variant="contained" color="primary" onClick={() => open()} disabled={!ready}>
-			Conectar
-		</Button>
-	);
+	if (isValid === false) {
+		return <DangerText>Token invalido!</DangerText>;
+	}
+
+	return null;
 };
 
 const App: FunctionComponent = () => {
@@ -46,7 +74,13 @@ const App: FunctionComponent = () => {
 			<Container>
 				<Text>Ingresar Token</Text>
 				<TextField value={auxToken} onChange={(e) => setAuxToken(e.target.value)} />
-				<Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+				<Button
+					variant="contained"
+					color="primary"
+					fullWidth
+					onClick={handleSubmit}
+					disabled={auxToken === ""}
+				>
 					Enviar
 				</Button>
 				<Button variant="outlined" color="primary" fullWidth onClick={handleClean}>
@@ -74,4 +108,9 @@ const Container = styled.div`
 
 const Text = styled.h1`
 	font-size: 2rem;
+`;
+
+const DangerText = styled.h2`
+	font-size: 1.5rem;
+	color: #b31d15;
 `;
