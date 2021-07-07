@@ -21,3 +21,7 @@ Si la ventana no se abre automaticamente, puedes dirigirte al navegador con la s
 ```
 http://localhost:3000
 ```
+
+### Generar Token
+
+Puedes crear un token(link_token) a través de Postman con la siguiente documentacion: [Plaid-Postman](https://github.com/plaid/plaid-postman#configuration)
